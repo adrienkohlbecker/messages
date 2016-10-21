@@ -1,0 +1,46 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/k0kubun/colorstring",
+			"repository": "https://github.com/k0kubun/colorstring",
+			"vcs": "git",
+			"revision": "9440f1994b88a579ce4e2884bfb4532b79bdca7a",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/k0kubun/pp",
+			"repository": "https://github.com/k0kubun/pp",
+			"vcs": "git",
+			"revision": "f5dce6ed0ccf6c350f1679964ff6b61f3d6d2033",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattn/go-colorable",
+			"repository": "https://github.com/mattn/go-colorable",
+			"vcs": "git",
+			"revision": "6c903ff4aa50920ca86087a280590b36b3152b9c",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattn/go-isatty",
+			"repository": "https://github.com/mattn/go-isatty",
+			"vcs": "git",
+			"revision": "66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "golang.org/x/sys/unix",
+			"repository": "https://go.googlesource.com/sys",
+			"vcs": "git",
+			"revision": "002cbb5f952456d0c50e0d2aff17ea5eca716979",
+			"branch": "master",
+			"path": "/unix",
+			"notests": true
+		}
+	]
+}
