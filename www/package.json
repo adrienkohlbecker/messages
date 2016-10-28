@@ -34,11 +34,11 @@
     "typescript": "^2.0.3"
   },
   "cordovaPlugins": [
-    "cordova-plugin-whitelist",
-    "cordova-plugin-console",
-    "cordova-plugin-statusbar",
     "cordova-plugin-device",
+    "cordova-plugin-console",
+    "cordova-plugin-whitelist",
     "cordova-plugin-splashscreen",
+    "cordova-plugin-statusbar",
     "ionic-plugin-keyboard"
   ],
   "cordovaPlatforms": [
