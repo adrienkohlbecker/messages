@@ -2,23 +2,27 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
 	"github.com/adrienkohlbecker/messages/model"
-	"github.com/k0kubun/pp"
+	"github.com/vincent-petithory/dataurl"
 )
 
 type SMSes struct {
 	XMLName xml.Name `xml:"smses"`
 	Count   int      `xml:"count,attr"`
 	SMSes   []SMS    `xml:"sms"`
+	MMSes   []MMS    `xml:"mms"`
 }
 
 var Entities = map[string]string{
@@ -86,11 +90,12 @@ var Entities = map[string]string{
 }
 
 var Addresses = map[string]string{
-	"33785529239":    "+33785529239",
-	"695959773":      "+33695959773",
-	"33695218383":    "+33695218383",
-	"33628255966":    "+33628255966",
-	"(+33)615528008": "+33615528008",
+	"33785529239":          "+33785529239",
+	"695959773":            "+33695959773",
+	"33695218383":          "+33695218383",
+	"33628255966":          "+33628255966",
+	"(+33)615528008":       "+33615528008",
+	"insert-address-token": "+33661779655",
 }
 
 type SMS struct {
@@ -109,9 +114,42 @@ type SMS struct {
 	Locked        int      `xml:"locked,attr"`
 }
 
+type MMS struct {
+	XMLName      xml.Name `xml:"mms"`
+	MsgBox       int      `xml:"msg_box,attr"`
+	Date         int64    `xml:"date,attr"`
+	AddressTilde string   `xml:"address,attr"`
+	Parts        MMSParts `xml:"parts"`
+	Addrs        MMSAddrs `xml:"addrs"`
+}
+
+type MMSParts struct {
+	XMLName xml.Name  `xml:"parts"`
+	Parts   []MMSPart `xml:"part"`
+}
+
+type MMSPart struct {
+	XMLName xml.Name `xml:"part"`
+	CT      string   `xml:"ct,attr"`
+	FN      string   `xml:"fn,attr"`
+	Text    string   `xml:"text,attr"`
+	Data    string   `xml:"data,attr"`
+}
+
+type MMSAddrs struct {
+	XMLName xml.Name  `xml:"addrs"`
+	Addrs   []MMSAddr `xml:"addr"`
+}
+
+type MMSAddr struct {
+	XMLName xml.Name `xml:"addr"`
+	Address string   `xml:"address,attr"`
+	Type    int      `xml:"type,attr"`
+}
+
 func main() {
 
-	file := "/Users/adrien/Desktop/messages-store/source/signal_g4_sms_perso.xml"
+	file := "/Users/adrien/Desktop/messages-store/source/sms-20161030040001.xml"
 
 	loc, err := time.LoadLocation("Europe/Paris")
 	if err != nil {
@@ -142,20 +180,7 @@ func main() {
 
 	for _, sms := range v.SMSes {
 
-		address := strings.Replace(sms.Address, " ", "", -1)
-
-		new, ok := Addresses[address]
-		if ok {
-			address = new
-		} else {
-			if !strings.HasPrefix(address, "+") {
-				if strings.HasPrefix(address, "0") {
-					address = "+33" + address[1:len(address)]
-				} else {
-					log.Printf("[WARN]: Unknown number format: %s", address)
-				}
-			}
-		}
+		address := parseAddr(sms.Address)
 
 		var sender string
 		if sms.Type != 2 {
@@ -165,7 +190,7 @@ func main() {
 		msgs = append(msgs, &model.Message{
 			ID:          "",
 			Sender:      sender,
-			Content:     sms.Body,
+			Content:     strings.TrimSpace(sms.Body),
 			Timestamp:   time.Unix(sms.Date/1000, (sms.Date-(sms.Date/1000)*1000)*1000000).In(loc),
 			Sent:        (sms.Type == 2),
 			Attachments: make([]*model.Attachment, 0),
@@ -174,17 +199,119 @@ func main() {
 		})
 	}
 
+	for _, mms := range v.MMSes {
+
+		var sender string
+		for _, addr := range mms.Addrs.Addrs {
+			if addr.Type == 137 {
+				sender = parseAddr(addr.Address)
+			}
+		}
+
+		var content string
+		for _, part := range mms.Parts.Parts {
+			if part.CT == "text/plain" {
+				content = part.Text
+			}
+		}
+
+		var attachments []*model.Attachment
+		for _, part := range mms.Parts.Parts {
+			if part.CT != "text/plain" && part.CT != "application/smil" {
+
+				url, loopErr := dataurl.DecodeString("data:" + part.CT + ";base64," + part.Data)
+				if loopErr != nil {
+					log.Fatal(loopErr)
+				}
+
+				var extension string
+				var kind string
+
+				switch part.CT {
+				case "image/jpeg":
+					extension = ".jpg"
+					kind = "img"
+				case "image/png":
+					extension = ".png"
+					kind = "img"
+				case "text/x-vCard":
+					extension = ".vcard"
+					kind = "vcard"
+				default:
+					log.Fatalf("unknown extension for %s", part.CT)
+				}
+
+				path := part.FN
+				if strings.HasPrefix(part.FN, "part-") || part.FN == "null" {
+					path = fmt.Sprintf("%x", md5.Sum(url.Data)) + extension
+				}
+
+				log.Printf("Wrote %s", path)
+				path = filepath.Join("/Users/adrien/Desktop/messages-store/mediatmp", path)
+
+				loopErr = ioutil.WriteFile(path, url.Data, os.FileMode(0644))
+				if loopErr != nil {
+					log.Fatal(loopErr)
+				}
+
+				attachments = append(attachments, &model.Attachment{
+					Kind: kind,
+					URL:  path,
+				})
+
+			}
+		}
+
+		groupElt := strings.Split(mms.AddressTilde, "~")
+		for i := range groupElt {
+			groupElt[i] = parseAddr(groupElt[i])
+		}
+		sort.Strings(groupElt)
+		group := strings.Join(groupElt, "~")
+
+		msgs = append(msgs, &model.Message{
+			ID:          "",
+			Sender:      sender,
+			Content:     strings.TrimSpace(content),
+			Timestamp:   time.Unix(mms.Date/1000, (mms.Date-(mms.Date/1000)*1000)*1000000).In(loc),
+			Sent:        (mms.MsgBox == 2),
+			Attachments: attachments,
+			Group:       group,
+			Kind:        "mms",
+		})
+
+	}
+
 	sort.Sort(msgs)
 
 	msgsJSON, err := json.MarshalIndent(msgs, "", "\t")
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile(strings.Replace(filepath.Base(file), filepath.Ext(file), ".json", 1), msgsJSON, 0644)
+	err = ioutil.WriteFile(filepath.Join("/Users/adrien/Desktop/messages-store", strings.Replace(filepath.Base(file), filepath.Ext(file), ".json", 1)), msgsJSON, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pp.Println(msgs)
+	//pp.Println(v.MMSes)
 
+}
+
+func parseAddr(s string) string {
+	address := strings.Replace(s, " ", "", -1)
+
+	new, ok := Addresses[address]
+	if ok {
+		address = new
+	} else {
+		if !strings.HasPrefix(address, "+") {
+			if strings.HasPrefix(address, "0") {
+				address = "+33" + address[1:len(address)]
+			} else {
+				log.Printf("[WARN]: Unknown number format: %s", address)
+			}
+		}
+	}
+
+	return address
 }
