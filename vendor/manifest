@@ -34,6 +34,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/vincent-petithory/dataurl",
+			"repository": "https://github.com/vincent-petithory/dataurl",
+			"vcs": "git",
+			"revision": "9a301d65acbb728fcc3ace14f45f511a4cfeea9c",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "golang.org/x/sys/unix",
 			"repository": "https://go.googlesource.com/sys",
 			"vcs": "git",
