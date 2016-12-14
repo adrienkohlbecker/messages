@@ -42,6 +42,12 @@ var HTML = map[string]string{
 	"<img src=\"/images/emoji/apple/1f620.png\" class=\"emoji\" title=\":angry:\">":            "😠",
 	"<img src=\"/images/emoji/apple/1f62c.png\" class=\"emoji\" title=\":grimacing:\">":        "😬",
 	"<img src=\"/images/emoji/apple/1f633.png\" class=\"emoji\" title=\":flushed:\">":          "😳",
+	"<img src=\"/images/emoji/apple/1f60d.png\" class=\"emoji\" title=\":heart_eyes:\">":       "😍",
+	"<img src=\"/images/emoji/apple/1f613.png\" class=\"emoji\" title=\":sweat:\">":            "😓",
+	"<img src=\"/images/emoji/apple/1f628.png\" class=\"emoji\" title=\":fearful:\">":          "😨",
+	"<img src=\"/images/emoji/apple/1f911.png\" class=\"emoji\" title=\":money_mouth_face:\">": "🤑",
+	"<img src=\"/images/emoji/apple/1f494.png\" class=\"emoji\" title=\":broken_heart:\">":     "💔",
+	"<img src=\"/images/emoji/apple/1f60a.png\" class=\"emoji\" title=\":blush:\">":            "😊",
 }
 var LinkRegex = regexp.MustCompile("<a href=\"([^\"]+)\" target=\"_blank\">[^<]+</a>")
 
