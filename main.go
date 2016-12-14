@@ -26,6 +26,66 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// bytes, err := ioutil.ReadFile("/Users/adrien/Desktop/messages-store/temp.txt")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	//
+	// var list [][]string
+	// err = json.Unmarshal(bytes, &list)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	//
+	// loc, err := time.LoadLocation("Europe/Paris")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	//
+	// for _, item := range list {
+	//
+	// 	t, loopErr := time.Parse("Jan 2, 15:04:05", item[1])
+	// 	if loopErr != nil {
+	// 		log.Fatal(loopErr)
+	// 	}
+	// 	t = time.Date(2016, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), loc)
+	//
+	// 	var att []*model.Attachment
+	// 	if len(item) == 4 {
+	// 		kind := "img"
+	// 		if strings.HasSuffix(item[3], ".mp4") {
+	// 			kind = "video"
+	// 		}
+	// 		att = append(att, &model.Attachment{
+	// 			URL:  item[3],
+	// 			Kind: kind,
+	// 		})
+	// 	}
+	//
+	// 	sender := item[0]
+	// 	if sender == "Adrien" {
+	// 		sender = ""
+	// 	}
+	//
+	// 	msg := &model.Message{
+	// 		ID:          "",
+	// 		Sender:      sender,
+	// 		Content:     item[2],
+	// 		Timestamp:   t,
+	// 		Sent:        item[0] == "Adrien",
+	// 		Attachments: att,
+	// 		Group:       "+33629448767~+33695218383",
+	// 		Kind:        "signal",
+	// 	}
+	//
+	// 	msgs = append(msgs, msg)
+	//
+	// }
+	//
+	// sort.Sort(msgs)
+	//
+	// msgs.Write("/Users/adrien/Desktop/messages-store/signal_g5_full.json")
+
 	for _, msg := range msgs {
 
 		_, ok := byGroup[msg.Group]
