@@ -94,6 +94,12 @@ func main() {
 				filename = fmt.Sprintf("%s.jpeg", name)
 			case "video":
 				filename = fmt.Sprintf("%s.mp4", name)
+			case "audio":
+				filename = fmt.Sprintf("%s.mp3", name)
+			case "gif":
+				filename = fmt.Sprintf("%s.gif", name)
+			case "png":
+				filename = fmt.Sprintf("%s.png", name)
 			default:
 				log.Fatal("unknown type")
 			}

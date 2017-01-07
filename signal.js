@@ -63,6 +63,12 @@ console.log(JSON.stringify([].concat(...$$(".conversation").map(function(current
         url: videoElt.getAttribute("src")
       });
     });
+    currentValue.querySelectorAll(".attachment audio source").forEach(function(audioElt, index, array) {
+      attachments.push({
+        kind: "audio",
+        url: audioElt.getAttribute("src")
+      });
+    });
 
     if (currentValue.querySelectorAll(".attachment").length != attachments.length) {
       console.error("Unmached attachement", currentValue)

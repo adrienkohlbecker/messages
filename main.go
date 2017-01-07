@@ -180,10 +180,18 @@ func main() {
 				{{ range .Attachments }}
 				  {{ if eq .Kind "img" }}
 						<img src="/serve?path={{ .URL }}" />
+				  {{ else if eq .Kind "png" }}
+						<img src="/serve?path={{ .URL }}" />
+				  {{ else if eq .Kind "gif" }}
+						<img src="/serve?path={{ .URL }}" />
 					{{ else if eq .Kind "video" }}
 						<video controls src="/serve?path={{.URL}}" />
+					{{ else if eq .Kind "audio" }}
+						<audio controls src="/serve?path={{.URL}}" />
 					{{ else if eq .Kind "vcard" }}
 						<a href="/serve?path={{.URL}}">download vcard</a>
+					{{ else }}
+					  {{.URL}}
 					{{ end }}
 				{{ end }}
 			</div>
