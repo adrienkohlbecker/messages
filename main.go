@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/adrienkohlbecker/messages/model"
@@ -21,10 +22,20 @@ var tmpl *template.Template
 
 func main() {
 
-	msgs, err := model.Load("/Users/adrien/Desktop/messages-store/signal_g4.json")
-	if err != nil {
-		log.Fatal(err)
+	files := []string{
+		"/Users/adrien/Desktop/messages-store/signal.json",
 	}
+
+	var msgs model.Messages
+
+	for _, file := range files {
+		m, err := model.Load(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+		msgs = append(msgs, m...)
+	}
+	sort.Sort(msgs)
 
 	// bytes, err := ioutil.ReadFile("/Users/adrien/Desktop/messages-store/temp.txt")
 	// if err != nil {
@@ -188,6 +199,8 @@ func main() {
 						<video controls src="/serve?path={{.URL}}" />
 					{{ else if eq .Kind "audio" }}
 						<audio controls src="/serve?path={{.URL}}" />
+					{{ else if eq .Kind "aac" }}
+						<audio controls src="/serve?path={{.URL}}" />
 					{{ else if eq .Kind "vcard" }}
 						<a href="/serve?path={{.URL}}">download vcard</a>
 					{{ else }}
@@ -204,10 +217,12 @@ func main() {
 {{ end }}
 `
 
-	tmpl, err = template.New("msgs").Funcs(template.FuncMap{"hasPrefix": hasPrefix, "toURL": toURL, "formatContent": formatContent}).Parse(tmplStr)
+	t, err := template.New("msgs").Funcs(template.FuncMap{"hasPrefix": hasPrefix, "toURL": toURL, "formatContent": formatContent}).Parse(tmplStr)
 	if err != nil {
 		panic(err)
 	}
+
+	tmpl = t
 
 	http.HandleFunc("/", msgHandler)
 	http.HandleFunc("/serve", serveHandler)
