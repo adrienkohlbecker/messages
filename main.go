@@ -195,6 +195,8 @@ func main() {
 						<img src="/serve?path={{ .URL }}" />
 				  {{ else if eq .Kind "gif" }}
 						<img src="/serve?path={{ .URL }}" />
+				  {{ else if eq .Kind "gifv" }}
+				  		<video controls src="/serve?path={{.URL}}" autoplay loop />
 					{{ else if eq .Kind "video" }}
 						<video controls src="/serve?path={{.URL}}" />
 					{{ else if eq .Kind "audio" }}
