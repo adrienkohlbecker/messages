@@ -23,7 +23,7 @@ var tmpl *template.Template
 func main() {
 
 	files := []string{
-		"/Users/adrien/Desktop/messages-store/signal.json",
+		"/Users/ak/Desktop/messages-store/signal.json",
 	}
 
 	var msgs model.Messages
@@ -37,7 +37,7 @@ func main() {
 	}
 	sort.Sort(msgs)
 
-	// bytes, err := ioutil.ReadFile("/Users/adrien/Desktop/messages-store/temp.txt")
+	// bytes, err := ioutil.ReadFile("/Users/ak/Desktop/messages-store/temp.txt")
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
@@ -95,7 +95,7 @@ func main() {
 	//
 	// sort.Sort(msgs)
 	//
-	// msgs.Write("/Users/adrien/Desktop/messages-store/signal_g5_full.json")
+	// msgs.Write("/Users/ak/Desktop/messages-store/signal_g5_full.json")
 
 	for _, msg := range msgs {
 
@@ -247,7 +247,7 @@ func serveHandler(w http.ResponseWriter, r *http.Request) {
 
 	path := r.URL.Query().Get("path")
 
-	if !strings.HasPrefix(path, "/Users/adrien/Dropbox/Applications/Messages/media") {
+	if !strings.HasPrefix(path, "/Users/ak/Google Drive/Applications/Messages/media") {
 		panic("unauthorized")
 	}
 

@@ -160,7 +160,7 @@ type MMSAddr struct {
 
 func main() {
 
-	file := "/Users/adrien/Desktop/SignalPlaintextBackup.xml"
+	file := "/Users/ak/Dropbox/SignalPlaintextBackup.xml"
 
 	loc, err := time.LoadLocation("Europe/Paris")
 	if err != nil {
@@ -261,7 +261,7 @@ func main() {
 				}
 
 				log.Printf("Wrote %s", path)
-				path = filepath.Join("/Users/adrien/Desktop/messages-store/mediatmp", path)
+				path = filepath.Join("/Users/ak/Desktop/messages-store/mediatmp", path)
 
 				loopErr = ioutil.WriteFile(path, url.Data, os.FileMode(0644))
 				if loopErr != nil {
@@ -302,7 +302,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile(filepath.Join("/Users/adrien/Desktop/messages-store", strings.Replace(filepath.Base(file), filepath.Ext(file), ".json", 1)), msgsJSON, 0644)
+	err = ioutil.WriteFile(filepath.Join("/Users/ak/Desktop/messages-store", strings.Replace(filepath.Base(file), filepath.Ext(file), ".json", 1)), msgsJSON, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

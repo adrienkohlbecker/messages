@@ -89,12 +89,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile(filepath.Join("/Users/adrien/Dropbox/Applications/Messages", filepath.Base(source)), resultJSON, 0644)
+	err = ioutil.WriteFile(filepath.Join("/Users/ak/Google Drive/Applications/Messages", filepath.Base(source)), resultJSON, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pp.Println(filepath.Join("/Users/adrien/Dropbox/Applications/Messages", filepath.Base(source)))
+	pp.Println(filepath.Join("/Users/ak/Google Drive/Applications/Messages", filepath.Base(source)))
 
 }
 
@@ -128,7 +128,7 @@ func Parse(group string, line string) (*model.Message, error) {
 
 	attMatches := attRegex.FindStringSubmatch(content)
 	if len(attMatches) != 0 {
-		attachments = append(attachments, &model.Attachment{Kind: "img", URL: "/Users/adrien/Dropbox/Applications/Messages/media/" + attMatches[1]})
+		attachments = append(attachments, &model.Attachment{Kind: "img", URL: "/Users/ak/Google Drive/Applications/Messages/media/" + attMatches[1]})
 		content = attMatches[2]
 	}
 

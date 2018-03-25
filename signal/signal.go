@@ -143,8 +143,8 @@ func main() {
 				log.Fatal("unknown type")
 			}
 
-			path := filepath.Join("/Users/adrien/Downloads", filename)
-			newPath := filepath.Join("/Users/adrien/Dropbox/Applications/Messages/media", filename)
+			path := filepath.Join("/Users/ak/Downloads", filename)
+			newPath := filepath.Join("/Users/ak/Google Drive/Applications/Messages/media", filename)
 			if !FileExists(path) && !FileExists(newPath) {
 				log.Fatalf("File does not exist: %s (%s)", attachment.URL, path)
 			}
@@ -200,12 +200,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile(filepath.Join("/Users/adrien/Dropbox/Applications/Messages", filepath.Base(source)), resultJSON, 0644)
+	err = ioutil.WriteFile(filepath.Join("/Users/ak/Google Drive/Applications/Messages", filepath.Base(source)), resultJSON, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pp.Println(filepath.Join("/Users/adrien/Dropbox/Applications/Messages", filepath.Base(source)))
+	pp.Println(filepath.Join("/Users/ak/Google Drive/Applications/Messages", filepath.Base(source)))
 
 }
 
