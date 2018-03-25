@@ -17,8 +17,8 @@ import (
 	"github.com/k0kubun/pp"
 )
 
-var msgRegex = regexp.MustCompile("(\\d{1,2}/\\d{1,2}/\\d{1,2}, \\d{1,2}:\\d{1,2}) - ([\\w\\s]+): (.*)")
-var attRegex = regexp.MustCompile("(.*) \\(file attached\\)(?:\\n(.*))?")
+var msgRegex = regexp.MustCompile("(\\d{1,2}/\\d{1,2}/\\d{1,4} \\d{1,2}:\\d{1,2}:\\d{1,2}): ([\\w\\s]+): (.*)")
+var attRegex = regexp.MustCompile("(.*) <attached>(?:\\n(.*))?")
 var loc *time.Location
 
 func init() {
@@ -115,7 +115,7 @@ func Parse(group string, line string) (*model.Message, error) {
 
 	pp.Println(matches)
 
-	t, err := time.Parse("1/2/06, 15:04", matches[1])
+	t, err := time.Parse("02/01/2006 15:04:05", matches[1])
 	if err != nil {
 		return nil, err
 	}
