@@ -11,4 +11,5 @@ type Message struct {
 	Attachments []*Attachment `json:"attachments"`
 	Group       string        `json:"group"`
 	Kind        string        `json:"kind"`
+	RepliesTo   string        `json:"replies_to"`
 }
