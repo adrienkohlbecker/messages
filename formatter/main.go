@@ -1,54 +1,15 @@
-package main
+package formatter
 
 import (
 	"html/template"
 	"io"
-	"log"
-	"net/http"
-	"os"
 	"sort"
 	"strings"
 
 	"github.com/adrienkohlbecker/messages/model"
 )
 
-type Grouped struct {
-	Group    string
-	Messages model.Messages
-}
-
-var byGroup = make(map[string]*Grouped)
-var tmpl *template.Template
-
-func main() {
-
-	files := []string{
-		"/Users/ak/Desktop/messages-store/signal.json",
-	}
-
-	var msgs model.Messages
-
-	for _, file := range files {
-		m, err := model.Load(file)
-		if err != nil {
-			log.Fatal(err)
-		}
-		msgs = append(msgs, m...)
-	}
-	sort.Sort(msgs)
-
-	for _, msg := range msgs {
-
-		_, ok := byGroup[msg.Group]
-		if !ok {
-			byGroup[msg.Group] = &Grouped{Group: msg.Group, Messages: make(model.Messages, 0)}
-		}
-
-		byGroup[msg.Group].Messages = append(byGroup[msg.Group].Messages, msg)
-
-	}
-
-	tmplStr := `
+const tmplStr = `
 <style type="text/css">
 	body {
 	    font-family: Helvetica Neue;
@@ -159,57 +120,39 @@ func main() {
 {{ end }}
 `
 
-	t, err := template.New("msgs").Funcs(template.FuncMap{"hasPrefix": hasPrefix, "toURL": toURL, "formatContent": formatContent}).Parse(tmplStr)
-	if err != nil {
-		panic(err)
-	}
-
-	tmpl = t
-
-	http.HandleFunc("/", msgHandler)
-	http.HandleFunc("/serve", serveHandler)
-
-	log.Printf("Parsed %d messages", len(msgs))
-	log.Printf("Listening on :8080")
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
-
+type Grouped struct {
+	Group    string
+	Messages model.Messages
 }
 
-func msgHandler(w http.ResponseWriter, r *http.Request) {
+func Format(msgs model.Messages, w io.Writer) error {
 
-	err := tmpl.Execute(w, byGroup)
+	tmpl, err := template.New("msgs").Funcs(template.FuncMap{"hasPrefix": hasPrefix, "toURL": toURL, "formatContent": formatContent}).Parse(tmplStr)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-}
+	sort.Sort(msgs)
 
-func serveHandler(w http.ResponseWriter, r *http.Request) {
+	var byGroup = make(map[string]*Grouped)
 
-	path := r.URL.Query().Get("path")
+	for _, msg := range msgs {
 
-	if !strings.HasPrefix(path, "/Users/ak/Google Drive/Applications/Messages/media") {
-		panic("unauthorized")
+		_, ok := byGroup[msg.Group]
+		if !ok {
+			byGroup[msg.Group] = &Grouped{Group: msg.Group, Messages: make(model.Messages, 0)}
+		}
+
+		byGroup[msg.Group].Messages = append(byGroup[msg.Group].Messages, msg)
+
 	}
 
-	if strings.HasSuffix(path, ".jpg") {
-		w.Header().Add("Content-Type", "image/jpeg")
-	} else if strings.HasSuffix(path, ".mp4") {
-		w.Header().Add("Content-Type", "video/mp4")
-	}
-
-	file, err := os.Open(path)
+	err = tmpl.Execute(w, byGroup)
 	if err != nil {
-		log.Printf("ERROR: %s", err)
-		w.WriteHeader(500)
+		return err
 	}
 
-	_, err = io.Copy(w, file)
-	if err != nil {
-		log.Printf("ERROR: %s", err)
-		w.WriteHeader(500)
-	}
+	return nil
 
 }
 
