@@ -10,6 +10,10 @@ import (
 )
 
 const tmplStr = `
+<html>
+<head>
+<head>
+<meta charset="UTF-8">
 <style type="text/css">
 	body {
 	    font-family: Helvetica Neue;
@@ -76,7 +80,9 @@ const tmplStr = `
 		display: block;
 	}
 </style>
+</head>
 
+<body>
 {{range .}}
 	<h1 class="group-title">{{.Group}}</h1>
 
@@ -91,23 +97,19 @@ const tmplStr = `
 			<div class="message-attachments">
 				{{ range .Attachments }}
 				  {{ if eq .Kind "img" }}
-						<img src="/serve?path={{ .URL }}" />
-				  {{ else if eq .Kind "png" }}
-						<img src="/serve?path={{ .URL }}" />
-				  {{ else if eq .Kind "gif" }}
-						<img src="/serve?path={{ .URL }}" />
+						<img src="{{ .URL | toURL  }}" />
+				  {{ else if eq .Kind "sticker" }}
+						<img src="{{ .URL | toURL  }}" />
 				  {{ else if eq .Kind "gifv" }}
-				  		<video controls src="/serve?path={{.URL}}" autoplay loop />
+				  		<video controls src="{{.URL | toURL }}" autoplay loop />
 					{{ else if eq .Kind "video" }}
-						<video controls src="/serve?path={{.URL}}" />
+						<video controls src="{{.URL | toURL }}" />
 					{{ else if eq .Kind "audio" }}
-						<audio controls src="/serve?path={{.URL}}" />
-					{{ else if eq .Kind "aac" }}
-						<audio controls src="/serve?path={{.URL}}" />
-					{{ else if eq .Kind "vcard" }}
-						<a href="/serve?path={{.URL}}">download vcard</a>
+						<audio controls src="{{.URL | toURL }}" />
+					{{ else if eq .Kind "document" }}
+						<a href="{{.URL | toURL }}">download document</a>
 					{{ else }}
-					  {{.URL}}
+					  {{.URL | toURL }}
 					{{ end }}
 				{{ end }}
 			</div>
@@ -118,12 +120,9 @@ const tmplStr = `
 	{{ end }}
 
 {{ end }}
+</body>
+</html>
 `
-
-type Grouped struct {
-	Group    string
-	Messages model.Messages
-}
 
 func Format(msgs model.Messages, w io.Writer) error {
 
@@ -134,20 +133,7 @@ func Format(msgs model.Messages, w io.Writer) error {
 
 	sort.Sort(msgs)
 
-	var byGroup = make(map[string]*Grouped)
-
-	for _, msg := range msgs {
-
-		_, ok := byGroup[msg.Group]
-		if !ok {
-			byGroup[msg.Group] = &Grouped{Group: msg.Group, Messages: make(model.Messages, 0)}
-		}
-
-		byGroup[msg.Group].Messages = append(byGroup[msg.Group].Messages, msg)
-
-	}
-
-	err = tmpl.Execute(w, byGroup)
+	err = tmpl.Execute(w, msgs.ByGroup())
 	if err != nil {
 		return err
 	}

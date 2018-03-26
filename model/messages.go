@@ -47,3 +47,22 @@ func (msgs *Messages) Write(path string) error {
 	return nil
 
 }
+
+func (msgs *Messages) ByGroup() map[string]*Grouped {
+
+	var byGroup = make(map[string]*Grouped)
+
+	for _, msg := range *msgs {
+
+		_, ok := byGroup[msg.Group]
+		if !ok {
+			byGroup[msg.Group] = &Grouped{Group: msg.Group, Messages: make(Messages, 0)}
+		}
+
+		byGroup[msg.Group].Messages = append(byGroup[msg.Group].Messages, msg)
+
+	}
+
+	return byGroup
+
+}

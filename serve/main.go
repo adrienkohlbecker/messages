@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -38,6 +39,12 @@ func main() {
 }
 
 func msgHandler(w http.ResponseWriter, r *http.Request) {
+
+	for _, msg := range msgs {
+		for _, att := range msg.Attachments {
+			att.URL = fmt.Sprintf("/serve?path=%s", att.URL)
+		}
+	}
 
 	err := formatter.Format(msgs, w)
 	if err != nil {
